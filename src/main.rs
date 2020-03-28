@@ -1,7 +1,10 @@
+extern crate colorful;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
+use colorful::Colorful;
+use colorful::RGB;
 use pest::Parser;
 use std::fs;
 
@@ -55,6 +58,31 @@ fn main() {
         }
     }
 
-    println!("{:?}", targets);
-    // println!("{:?}", target_with_help_messages.help_messages);
+    // primary:
+    // - #a6cc70
+    //  - `RGB::new(166, 204, 112)`
+    // - bold
+    // title:
+    // - #ffcc66
+    //  - `RGB::new(255, 204, 102)`
+    // link:
+    // - #77a8d9
+    //  - `RGB::new(119,168,217)`
+    let primary = RGB::new(166, 204, 112);
+    let title = RGB::new(255, 204, 102);
+    // let link = RGB::new(166, 204, 112);
+
+    println!("{}", "my-project".color(primary).bold());
+    println!("{} \n", "Project description using Make");
+    println!("{}", "USAGE".color(title));
+    println!("    {}\n", "make <SUBCOMMAND>");
+    println!("{}", "SUBCOMMANDS".color(title));
+
+    for target in targets.targets {
+        println!(
+            "{}    {:?}",
+            target.name.color(primary).bold(),
+            target.help_messages
+        );
+    }
 }
