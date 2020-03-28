@@ -1,0 +1,11 @@
+sentence = { (LETTER | SPACE_SEPARATOR | PUNCTUATION)+ }
+
+help = { "## " ~ (sentence)* }
+
+phony = _{ ".PHONY: " ~ (LETTER)+}
+
+command_name = { (LETTER | "_" | "-" | "/")+ }
+
+command = { (command_name)* ~ ":" }
+
+file = { SOI ~ (help | phony | command | ANY | "\n")* ~ EOI}
