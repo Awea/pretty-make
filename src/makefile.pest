@@ -14,4 +14,4 @@ target_with_help = {
   ~ target
 }
 
-file = { SOI ~ (target_with_help | ANY )* ~ EOI}
+makefile = _{ SOI ~ (target_with_help | ANY )* ~ EOI}
