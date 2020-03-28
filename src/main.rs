@@ -18,12 +18,7 @@ fn main() {
 
     for record in file.into_inner() {
         match record.as_rule() {
-            Rule::help => {
-                for field in record.into_inner() {
-                    println!("{:?}", field);
-                }
-            }
-            Rule::command => {
+            Rule::target_with_help => {
                 for field in record.into_inner() {
                     println!("{:?}", field);
                 }

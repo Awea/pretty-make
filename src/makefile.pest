@@ -1,11 +1,17 @@
-sentence = { (LETTER | SPACE_SEPARATOR | PUNCTUATION)+ }
+help_message = { (LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
 
-help = { "## " ~ (sentence)* }
+help = _{ "## " ~ (help_message)* }
 
-phony = _{ ".PHONY: " ~ (LETTER)+}
+phony = _{ ".PHONY: " ~ (LETTER)*}
 
-command_name = { (LETTER | "_" | "-" | "/")+ }
+target_name = { (LETTER | "_" | "-" | "/")+ }
 
-command = { (command_name)* ~ ":" }
+target = _{ (target_name)* ~ ":" }
 
-file = { SOI ~ (help | phony | command | ANY | "\n")* ~ EOI}
+target_with_help = {
+  help ~ "\n"
+  ~ (phony ~ "\n")*
+  ~ target
+}
+
+file = { SOI ~ (target_with_help | ANY )* ~ EOI}
