@@ -9,7 +9,7 @@ target_name = { (LETTER | "_" | "-" | "/")+ }
 target = _{ (target_name)* ~ ":" }
 
 target_with_help = {
-  help ~ "\n"
+  (help ~ "\n")+
   ~ (phony ~ "\n")*
   ~ target
 }

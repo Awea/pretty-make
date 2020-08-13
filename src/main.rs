@@ -31,9 +31,13 @@ fn main() {
         targets: Vec::new(),
     };
 
+    // println!("{:?}", file);
+
     for record in file {
         match record.as_rule() {
             Rule::target_with_help => {
+                // println!("{:?}", record);
+
                 let name = record
                     .clone()
                     .into_inner()
@@ -43,13 +47,13 @@ fn main() {
                 let help_messages = record
                     .clone()
                     .into_inner()
-                    .find(|x| x.as_rule() == Rule::help_message)
+                    .filter(|x| x.as_rule() == Rule::help_message)
                     .map(|x| String::from(x.as_str()))
-                    .unwrap();
+                    .collect();
 
                 let target_with_help_messages = TargetWithHelpMessage {
                     name: String::from(name.as_str()),
-                    help_messages: vec![help_messages],
+                    help_messages: help_messages,
                 };
                 targets.targets.push(target_with_help_messages)
             }
@@ -70,7 +74,7 @@ fn main() {
     //  - `RGB::new(119,168,217)`
     let primary = RGB::new(166, 204, 112);
     let title = RGB::new(255, 204, 102);
-    // let link = RGB::new(166, 204, 112);
+    let link = RGB::new(166, 204, 112);
 
     println!("{}", "my-project".color(primary).bold());
     println!("{} \n", "Project description using Make");
