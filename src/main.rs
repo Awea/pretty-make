@@ -1,8 +1,10 @@
+extern crate clap;
 extern crate colored;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
+use clap::App;
 use colored::*;
 use pest::Parser;
 use std::fs;
@@ -23,7 +25,15 @@ struct TargetWithHelpMessage {
 }
 
 fn main() {
-    let unparsed_file = fs::read_to_string("tests/fixtures/Makefile").expect("cannot read file");
+    let matches = App::new("Pretty Make")
+        .version("1.0")
+        .author("David A. <aweaoftheworld@gmail.com>")
+        .about("Make make pretty")
+        .arg("<makefile> 'Makefile to be pretty'")
+        .get_matches();
+
+    let makefile = matches.value_of("makefile").unwrap();
+    let unparsed_file = fs::read_to_string(makefile).expect("cannot read file");
     let file =
         MakefileParser::parse(Rule::makefile, &unparsed_file).unwrap_or_else(|e| panic!("{}", e));
     let mut targets = Targets {
@@ -31,8 +41,6 @@ fn main() {
     };
     let mut project_name: String = "".to_string();
     let mut project_description: String = "".to_string();
-
-    // println!("{:?}", file);
 
     for record in file {
         match record.as_rule() {
