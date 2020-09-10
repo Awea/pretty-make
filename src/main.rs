@@ -107,7 +107,7 @@ fn main() {
             project_description
         );
     } else {
-        println!("");
+        println!("This project uses Make for commands. \n");
     }
     println!("{}", "USAGE".truecolor(255, 204, 102));
     println!("    {}\n", "make <SUBCOMMAND>");
