@@ -17,7 +17,7 @@ struct Targets {
     targets: Vec<TargetWithHelpMessage>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct TargetWithHelpMessage {
     name: String,
     help_messages: Vec<String>,
@@ -102,11 +102,35 @@ fn main() {
     println!("    {}\n", "make <SUBCOMMAND>");
     println!("{}", "SUBCOMMANDS".color(title));
 
+    let longest_target_name =
+        targets
+            .targets
+            .iter()
+            .fold(targets.targets[0].clone(), |acc, item| {
+                if item.name.len() > acc.name.len() {
+                    item.clone()
+                } else {
+                    acc
+                }
+            });
+    let help_message_offset = longest_target_name.name.len() + 4;
+
     for target in targets.targets {
-        println!(
-            "{}    {:?}",
-            target.name.color(primary).bold(),
-            target.help_messages
+        print!(
+            "{target_name: <col$}",
+            // target_name = target.name.color(primary).bold(),
+            target_name = target.name,
+            col = help_message_offset
         );
+
+        let mut i = 0;
+        for help_message in target.help_messages {
+            if i > 0 {
+                print!("{: <1$}", "", help_message_offset);
+            }
+            println!("{}", help_message);
+
+            i = i + 1;
+        }
     }
 }
