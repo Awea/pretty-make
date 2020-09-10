@@ -36,4 +36,4 @@ serve: deps
 ## List available commands
 .PHONY: help
 help:
-	@bin/pretty-make
+	@bin/pretty-make Makefile
