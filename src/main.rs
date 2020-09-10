@@ -101,7 +101,14 @@ fn main() {
     //  - `RGB::new(119,168,217)`
 
     println!("{}", project_name.truecolor(166, 204, 112).bold());
-    println!("{} \n", project_description);
+    if project_description.len() > 0 {
+        println!(
+            "{} This project uses Make for commands. \n",
+            project_description
+        );
+    } else {
+        println!("");
+    }
     println!("{}", "USAGE".truecolor(255, 204, 102));
     println!("    {}\n", "make <SUBCOMMAND>");
     println!("{}", "SUBCOMMANDS".truecolor(255, 204, 102));
