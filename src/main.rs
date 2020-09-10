@@ -120,6 +120,7 @@ fn main() {
     let help_message_offset = longest_target_name.name.len() + 4;
 
     for target in targets.targets {
+        print!("{: <1$}", "", 4);
         print!(
             "{target_name: <col$}",
             target_name = target.name.truecolor(166, 204, 112).bold(),
@@ -129,6 +130,7 @@ fn main() {
         let mut i = 0;
         for help_message in target.help_messages {
             if i > 0 {
+                print!("{: <1$}", "", 4);
                 print!("{: <1$}", "", help_message_offset);
             }
             println!("{}", help_message);
