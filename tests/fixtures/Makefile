@@ -1,5 +1,5 @@
-#@name my-project
-#@description Project description using Make
+#@name Project name
+#@description Project description. This project uses Make for commands.
 
 .PHONY: deps
 deps: node_modules $(THEME_DIR)/vendor
