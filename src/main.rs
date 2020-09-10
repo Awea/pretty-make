@@ -30,6 +30,8 @@ fn main() {
     let mut targets = Targets {
         targets: Vec::new(),
     };
+    let mut project_name: String = "".to_string();
+    let mut project_description: String = "".to_string();
 
     // println!("{:?}", file);
 
@@ -57,6 +59,24 @@ fn main() {
                 };
                 targets.targets.push(target_with_help_messages)
             }
+            Rule::name => {
+                let line = record
+                    .clone()
+                    .into_inner()
+                    .find(|x| x.as_rule() == Rule::help_message)
+                    .unwrap();
+
+                project_name = String::from(line.as_str());
+            }
+            Rule::description => {
+                let line = record
+                    .clone()
+                    .into_inner()
+                    .find(|x| x.as_rule() == Rule::help_message)
+                    .unwrap();
+
+                project_description = String::from(line.as_str());
+            }
             Rule::EOI => (),
             _ => unreachable!(),
         }
@@ -74,10 +94,10 @@ fn main() {
     //  - `RGB::new(119,168,217)`
     let primary = RGB::new(166, 204, 112);
     let title = RGB::new(255, 204, 102);
-    let link = RGB::new(166, 204, 112);
+    // let link = RGB::new(166, 204, 112);
 
-    println!("{}", "my-project".color(primary).bold());
-    println!("{} \n", "Project description using Make");
+    println!("{}", project_name.color(primary).bold());
+    println!("{} \n", project_description);
     println!("{}", "USAGE".color(title));
     println!("    {}\n", "make <SUBCOMMAND>");
     println!("{}", "SUBCOMMANDS".color(title));

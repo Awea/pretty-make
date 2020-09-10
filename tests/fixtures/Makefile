@@ -1,3 +1,6 @@
+#@name my-project
+#@description Project description using Make
+
 .PHONY: deps
 deps: node_modules $(THEME_DIR)/vendor
 

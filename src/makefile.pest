@@ -1,5 +1,8 @@
 help_message = { (LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
 
+name = { "#@name " ~(help_message)* }
+description = { "#@description " ~(help_message)* }
+
 help = _{ "## " ~ (help_message)* }
 
 phony = _{ ".PHONY: " ~ (LETTER)*}
@@ -14,4 +17,4 @@ target_with_help = {
   ~ target
 }
 
-makefile = _{ SOI ~ (target_with_help | ANY )* ~ EOI}
+makefile = _{ SOI ~ (name | description | target_with_help | ANY)* ~ EOI}
