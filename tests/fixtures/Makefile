@@ -8,6 +8,10 @@ node_modules: package.json yarn.lock
 	@yarn install
 	@touch $@
 
+.PHONY: this-is-a-supa-command
+## Supa dupa command description
+this-is-a-supa-command:
+
 .PHONY: test
 ## Test site
 ## and stuff
