@@ -1,10 +1,9 @@
-extern crate colorful;
+extern crate colored;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
-use colorful::Colorful;
-use colorful::RGB;
+use colored::*;
 use pest::Parser;
 use std::fs;
 
@@ -92,15 +91,12 @@ fn main() {
     // link:
     // - #77a8d9
     //  - `RGB::new(119,168,217)`
-    let primary = RGB::new(166, 204, 112);
-    let title = RGB::new(255, 204, 102);
-    // let link = RGB::new(166, 204, 112);
 
-    println!("{}", project_name.color(primary).bold());
+    println!("{}", project_name.truecolor(166, 204, 112).bold());
     println!("{} \n", project_description);
-    println!("{}", "USAGE".color(title));
+    println!("{}", "USAGE".truecolor(255, 204, 102));
     println!("    {}\n", "make <SUBCOMMAND>");
-    println!("{}", "SUBCOMMANDS".color(title));
+    println!("{}", "SUBCOMMANDS".truecolor(255, 204, 102));
 
     let longest_target_name =
         targets
@@ -118,8 +114,7 @@ fn main() {
     for target in targets.targets {
         print!(
             "{target_name: <col$}",
-            // target_name = target.name.color(primary).bold(),
-            target_name = target.name,
+            target_name = target.name.truecolor(166, 204, 112).bold(),
             col = help_message_offset
         );
 
