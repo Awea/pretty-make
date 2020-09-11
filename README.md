@@ -8,7 +8,7 @@ To use Pretty Make you only have to add the following at the end of your Makefil
 
 ```Makefile
 bin/pretty-make:
-	bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
+	@bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
 
 .PHONY: help
 ## List available commands
@@ -40,6 +40,7 @@ another-command:
 
 ## ✍️ Authors
 - [**@Awea**](https://github.com/Awea) - Idea and initial work
+- [**@mmaayylliiss**](https://github.com/mmaayylliiss) - Design and review
 
 ## 🤜🤛 Contributing
 **Contributions, issues and feature requests are welcome!** See the list of [contributors](../../graphs/contributors) who participated in this project.
