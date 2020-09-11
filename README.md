@@ -1,7 +1,9 @@
 # Pretty Make
-An attempt to make [Make](https://www.gnu.org/software/make/) pretty.
+Make [Make](https://www.gnu.org/software/make/) pretty.
 
-🚧 For now it's only a replacement for a buggy `awk` command that I copy/paste in every project to have a pretty `make help`.
+This program intend to extend Make capabilities. Actually it parse a Makefile to produce a pretty help. See example below:
+
+🚧 screenshot
 
 ## 🏁 Installation
 To use Pretty Make you only have to add the following at the end of your Makefile:
