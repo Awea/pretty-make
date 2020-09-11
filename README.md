@@ -6,6 +6,7 @@ This program intend to extend Make capabilities. Actually it parse a Makefile to
 🚧 screenshot
 
 ## 🏁 Installation
+### Per project by downloading the binary
 To use Pretty Make you only have to add the following at the end of your Makefile:
 
 ```Makefile
@@ -16,6 +17,22 @@ bin/pretty-make:
 ## List available commands
 help: bin/pretty-make
 	@bin/pretty-make Makefile
+```
+
+### System-wide using cargo
+First you have to install Pretty Make using the following command:
+
+```bash
+cargo install pretty-make
+```
+
+Then you can use Pretty Make in your Makefile like this:
+
+```Makefile
+.PHONY: help
+## List available commands
+help:
+  @pretty-make Makefile
 ```
 
 ## ⌨️ Usage
