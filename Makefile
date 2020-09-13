@@ -9,7 +9,7 @@ SHELL := /usr/bin/env bash
 .PHONY: run
 ## Run Pretty Make on tests/fixtures/Makefile
 run:
-	@cargo run -- Makefile
+	@cargo run -- tests/fixtures/Makefile
 
 bin/pretty-make:
 	@bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
