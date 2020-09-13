@@ -1,11 +1,13 @@
 extern crate clap;
 extern crate colored;
+extern crate colors_transform;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
 
 use clap::App;
 use colored::*;
+use colors_transform::{Color, Rgb};
 use pest::iterators::Pair;
 use pest::Parser;
 use std::fs;
@@ -27,6 +29,8 @@ struct TargetWithHelpMessage {
 
 const INDENT_WIDTH: usize = 4;
 const DEFAULT_DESCRIPTION: &str = "This project uses Make for commands.";
+const DEFAULT_COLOR_TITLE: &str = "#a6cc70";
+const DEFAULT_COLOR_SUBTITLE: &str = "#ffcc66";
 
 // Source: https://stackoverflow.com/a/27841363
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -50,6 +54,13 @@ fn main() {
     };
     let mut project_name: String = "".to_string();
     let mut project_description: String = "".to_string();
+    let mut color_title: Rgb = hex_to_rgb(DEFAULT_COLOR_TITLE.to_string());
+    let mut color_subtitle: Rgb = hex_to_rgb(DEFAULT_COLOR_SUBTITLE.to_string());
+
+    // To customize color link I need to rewrite how I colorize links inside the following
+    // `for` loop because I need to know if the color is customized before I can actually
+    // customize it - @awea 20200913
+    let color_link: Rgb = hex_to_rgb("#77a8d9".to_string());
 
     for record in file {
         match record.as_rule() {
@@ -70,7 +81,8 @@ fn main() {
                         let mut result = String::from(x.as_str());
 
                         for link in links.iter() {
-                            let colored_link = format!("{}", link.truecolor(119, 168, 217));
+                            let colored_link =
+                                format!("{}", color_text(link.to_string(), color_link));
 
                             result = result.replace(link, &colored_link);
                         }
@@ -91,6 +103,12 @@ fn main() {
             Rule::description => {
                 project_description = get_text(&record, Rule::text);
             }
+            Rule::color_title => {
+                color_title = hex_to_rgb(get_text(&record, Rule::color));
+            }
+            Rule::color_subtitle => {
+                color_subtitle = hex_to_rgb(get_text(&record, Rule::color));
+            }
             Rule::EOI => (),
             _ => unreachable!(),
         }
@@ -105,22 +123,22 @@ fn main() {
     // - title
     //  - RGB: 255, 204, 102
     // - link
-    //  - RGB: 119,168,217
-    println!("{}", project_name.truecolor(166, 204, 112).bold());
+    //  - RGB: 119, 168, 217
+    println!("{}", color_text(project_name, color_title).bold());
     if project_description.len() > 0 {
         println!("{} {} \n", project_description, DEFAULT_DESCRIPTION);
     } else {
         println!("{} \n", DEFAULT_DESCRIPTION);
     }
-    println!("{}", "USAGE".truecolor(255, 204, 102));
+    println!("{}", color_text("USAGE".to_string(), color_subtitle));
     println!("    {}\n", "make <SUBCOMMAND>");
-    println!("{}", "SUBCOMMANDS".truecolor(255, 204, 102));
+    println!("{}", color_text("SUBCOMMANDS".to_string(), color_subtitle));
 
     for target in targets.targets {
         print!("{: <1$}", "", INDENT_WIDTH);
         print!(
             "{target_name: <col$}",
-            target_name = target.target_name.truecolor(166, 204, 112).bold(),
+            target_name = color_text(target.target_name, color_title).bold(),
             col = help_message_offset
         );
 
@@ -135,6 +153,18 @@ fn main() {
             i = i + 1;
         }
     }
+}
+
+fn hex_to_rgb(hex: String) -> Rgb {
+    Rgb::from_hex_str(&hex).unwrap()
+}
+
+fn color_text(text: String, color: Rgb) -> ColoredString {
+    text.truecolor(
+        color.get_red() as u8,
+        color.get_green() as u8,
+        color.get_blue() as u8,
+    )
 }
 
 fn get_text(record: &Pair<Rule>, rule_type: Rule) -> String {

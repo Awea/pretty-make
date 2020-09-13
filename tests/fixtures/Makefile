@@ -1,5 +1,7 @@
 #@name Project name
 #@description Project description.
+#@color-title #70c3cc
+#@color-subtitle #c970cc
 
 .PHONY: deps
 deps: node_modules $(THEME_DIR)/vendor

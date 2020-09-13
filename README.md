@@ -44,6 +44,8 @@ make help
 ```Makefile
 #@name Name of your project
 #@description A short description of your project (optional)
+#@color-title #a6cc70 (optional)
+#@color-subtitle #ffcc66 (optional)
 
 ## A description of my awesome-command
 command:

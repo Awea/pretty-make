@@ -1,8 +1,11 @@
 link = { ("http://" | "https://") ~ (LETTER | ":" | "." | NUMBER)+ }
 text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
+color = { "#" ~ (LETTER | NUMBER)+ }
 
 name = { "#@name " ~(text)* }
 description = { "#@description " ~(text)* }
+color_title = { "#@color-title " ~(color)* }
+color_subtitle = { "#@color-subtitle " ~(color)* }
 
 help = _{ "## " ~ (text)* }
 
@@ -18,4 +21,4 @@ target_with_help = {
   ~ target
 }
 
-makefile = _{ SOI ~ (name | description | target_with_help | ANY)* ~ EOI}
+makefile = _{ SOI ~ (name | description | color_title | color_subtitle | target_with_help | ANY)* ~ EOI}
