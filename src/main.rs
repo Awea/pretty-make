@@ -28,11 +28,16 @@ struct TargetWithHelpMessage {
 const INDENT_WIDTH: usize = 4;
 const DEFAULT_DESCRIPTION: &str = "This project uses Make for commands.";
 
+// Source: https://stackoverflow.com/a/27841363
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+const AUTHORS: &str = env!("CARGO_PKG_AUTHORS");
+const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+
 fn main() {
     let matches = App::new("Pretty Make")
-        .version("1.0")
-        .author("David A. <aweaoftheworld@gmail.com>")
-        .about("Make make pretty")
+        .version(VERSION)
+        .author(AUTHORS)
+        .about(DESCRIPTION)
         .arg("<makefile> 'Makefile to be pretty'")
         .get_matches();
 
