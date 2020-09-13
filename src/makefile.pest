@@ -1,11 +1,12 @@
-help_message = { (LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
+link = { ("http://" | "https://") ~ (LETTER | ":" | "." | NUMBER)+ }
+text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
 
-name = { "#@name " ~(help_message)* }
-description = { "#@description " ~(help_message)* }
+name = { "#@name " ~(text)* }
+description = { "#@description " ~(text)* }
 
-help = _{ "## " ~ (help_message)* }
+help = _{ "## " ~ (text)* }
 
-phony = _{ ".PHONY: " ~ (LETTER)*}
+phony = _{ ".PHONY: " ~ (LETTER)* }
 
 target_name = { (LETTER | "_" | "-" | "/")+ }
 

@@ -45,8 +45,6 @@ fn main() {
     for record in file {
         match record.as_rule() {
             Rule::target_with_help => {
-                // println!("{:?}", record);
-
                 let name = record
                     .clone()
                     .into_inner()
@@ -56,8 +54,25 @@ fn main() {
                 let help_messages = record
                     .clone()
                     .into_inner()
-                    .filter(|x| x.as_rule() == Rule::help_message)
-                    .map(|x| String::from(x.as_str()))
+                    .filter(|x| x.as_rule() == Rule::text)
+                    .map(|x| {
+                        let links: Vec<String> = x
+                            .clone()
+                            .into_inner()
+                            .filter(|x| x.as_rule() == Rule::link)
+                            .map(|x| String::from(x.as_str()))
+                            .collect();
+
+                        let mut result = String::from(x.as_str());
+
+                        for link in links.iter() {
+                            let colored_link = format!("{}", link.truecolor(119, 168, 217));
+
+                            result = result.replace(link, &colored_link);
+                        }
+
+                        result
+                    })
                     .collect();
 
                 let target_with_help_messages = TargetWithHelpMessage {
@@ -70,7 +85,7 @@ fn main() {
                 let line = record
                     .clone()
                     .into_inner()
-                    .find(|x| x.as_rule() == Rule::help_message)
+                    .find(|x| x.as_rule() == Rule::text)
                     .unwrap();
 
                 project_name = String::from(line.as_str());
@@ -79,7 +94,7 @@ fn main() {
                 let line = record
                     .clone()
                     .into_inner()
-                    .find(|x| x.as_rule() == Rule::help_message)
+                    .find(|x| x.as_rule() == Rule::text)
                     .unwrap();
 
                 project_description = String::from(line.as_str());
