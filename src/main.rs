@@ -6,6 +6,7 @@ extern crate pest_derive;
 
 use clap::App;
 use colored::*;
+use pest::iterators::Pair;
 use pest::Parser;
 use std::fs;
 
@@ -20,9 +21,12 @@ struct Targets {
 
 #[derive(Debug, Clone)]
 struct TargetWithHelpMessage {
-    name: String,
+    target_name: String,
     help_messages: Vec<String>,
 }
+
+const INDENT_WIDTH: usize = 4;
+const DEFAULT_DESCRIPTION: &str = "This project uses Make for commands.";
 
 fn main() {
     let matches = App::new("Pretty Make")
@@ -45,12 +49,7 @@ fn main() {
     for record in file {
         match record.as_rule() {
             Rule::target_with_help => {
-                let name = record
-                    .clone()
-                    .into_inner()
-                    .find(|x| x.as_rule() == Rule::target_name)
-                    .unwrap();
-
+                let target_name = get_text(&record, Rule::target_name);
                 let help_messages = record
                     .clone()
                     .into_inner()
@@ -76,33 +75,23 @@ fn main() {
                     .collect();
 
                 let target_with_help_messages = TargetWithHelpMessage {
-                    name: String::from(name.as_str()),
-                    help_messages: help_messages,
+                    target_name,
+                    help_messages,
                 };
                 targets.targets.push(target_with_help_messages)
             }
             Rule::name => {
-                let line = record
-                    .clone()
-                    .into_inner()
-                    .find(|x| x.as_rule() == Rule::text)
-                    .unwrap();
-
-                project_name = String::from(line.as_str());
+                project_name = get_text(&record, Rule::text);
             }
             Rule::description => {
-                let line = record
-                    .clone()
-                    .into_inner()
-                    .find(|x| x.as_rule() == Rule::text)
-                    .unwrap();
-
-                project_description = String::from(line.as_str());
+                project_description = get_text(&record, Rule::text);
             }
             Rule::EOI => (),
             _ => unreachable!(),
         }
     }
+
+    let help_message_offset = help_message_offset(&targets);
 
     // primary:
     // - #a6cc70
@@ -117,42 +106,26 @@ fn main() {
 
     println!("{}", project_name.truecolor(166, 204, 112).bold());
     if project_description.len() > 0 {
-        println!(
-            "{} This project uses Make for commands. \n",
-            project_description
-        );
+        println!("{} {} \n", project_description, DEFAULT_DESCRIPTION);
     } else {
-        println!("This project uses Make for commands. \n");
+        println!("{} \n", DEFAULT_DESCRIPTION);
     }
     println!("{}", "USAGE".truecolor(255, 204, 102));
     println!("    {}\n", "make <SUBCOMMAND>");
     println!("{}", "SUBCOMMANDS".truecolor(255, 204, 102));
 
-    let longest_target_name =
-        targets
-            .targets
-            .iter()
-            .fold(targets.targets[0].clone(), |acc, item| {
-                if item.name.len() > acc.name.len() {
-                    item.clone()
-                } else {
-                    acc
-                }
-            });
-    let help_message_offset = longest_target_name.name.len() + 4;
-
     for target in targets.targets {
-        print!("{: <1$}", "", 4);
+        print!("{: <1$}", "", INDENT_WIDTH);
         print!(
             "{target_name: <col$}",
-            target_name = target.name.truecolor(166, 204, 112).bold(),
+            target_name = target.target_name.truecolor(166, 204, 112).bold(),
             col = help_message_offset
         );
 
         let mut i = 0;
         for help_message in target.help_messages {
             if i > 0 {
-                print!("{: <1$}", "", 4);
+                print!("{: <1$}", "", INDENT_WIDTH);
                 print!("{: <1$}", "", help_message_offset);
             }
             println!("{}", help_message);
@@ -160,4 +133,30 @@ fn main() {
             i = i + 1;
         }
     }
+}
+
+fn get_text(record: &Pair<Rule>, rule_type: Rule) -> String {
+    let line = record
+        .clone()
+        .into_inner()
+        .find(|x| x.as_rule() == rule_type)
+        .unwrap();
+
+    String::from(line.as_str())
+}
+
+fn help_message_offset(targets: &Targets) -> usize {
+    let longest_target_name =
+        targets
+            .targets
+            .iter()
+            .fold(targets.targets[0].clone(), |acc, item| {
+                if item.target_name.len() > acc.target_name.len() {
+                    item.clone()
+                } else {
+                    acc
+                }
+            });
+
+    longest_target_name.target_name.len() + INDENT_WIDTH
 }
