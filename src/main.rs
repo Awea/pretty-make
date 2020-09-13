@@ -98,17 +98,14 @@ fn main() {
 
     let help_message_offset = help_message_offset(&targets);
 
-    // primary:
-    // - #a6cc70
-    //  - `RGB::new(166, 204, 112)`
-    // - bold
-    // title:
-    // - #ffcc66
-    //  - `RGB::new(255, 204, 102)`
-    // link:
-    // - #77a8d9
-    //  - `RGB::new(119,168,217)`
-
+    // Help output starts here, colors used are the followings:
+    // - Primary
+    //  - RGB: 166, 204, 112
+    //  - bold
+    // - title
+    //  - RGB: 255, 204, 102
+    // - link
+    //  - RGB: 119,168,217
     println!("{}", project_name.truecolor(166, 204, 112).bold());
     if project_description.len() > 0 {
         println!("{} {} \n", project_description, DEFAULT_DESCRIPTION);
