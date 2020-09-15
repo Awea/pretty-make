@@ -6,6 +6,7 @@ name = { "#@name " ~(text)* }
 description = { "#@description " ~(text)* }
 color_title = { "#@color-title " ~(color)* }
 color_subtitle = { "#@color-subtitle " ~(color)* }
+color_link = { "#@color-link " ~(color)* }
 
 help = _{ "## " ~ (text)* }
 
@@ -21,4 +22,4 @@ target_with_help = {
   ~ target
 }
 
-makefile = _{ SOI ~ (name | description | color_title | color_subtitle | target_with_help | ANY)* ~ EOI}
+makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | ANY)* ~ EOI}

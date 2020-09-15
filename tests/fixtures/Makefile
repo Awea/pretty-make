@@ -2,6 +2,7 @@
 #@description Project description.
 #@color-title #70c3cc
 #@color-subtitle #c970cc
+#@color-link #0314fc
 
 .PHONY: deps
 deps: node_modules $(THEME_DIR)/vendor

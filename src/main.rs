@@ -31,6 +31,7 @@ const INDENT_WIDTH: usize = 4;
 const DEFAULT_DESCRIPTION: &str = "This project uses Make for commands.";
 const DEFAULT_COLOR_TITLE: &str = "#a6cc70";
 const DEFAULT_COLOR_SUBTITLE: &str = "#ffcc66";
+const DEFAULT_COLOR_LINK: &str = "#77a8d9";
 
 // Source: https://stackoverflow.com/a/27841363
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -56,11 +57,7 @@ fn main() {
     let mut project_description: String = "".to_string();
     let mut color_title: Rgb = hex_to_rgb(DEFAULT_COLOR_TITLE.to_string());
     let mut color_subtitle: Rgb = hex_to_rgb(DEFAULT_COLOR_SUBTITLE.to_string());
-
-    // To customize color link I need to rewrite how I colorize links inside the following
-    // `for` loop because I need to know if the color is customized before I can actually
-    // customize it - @awea 20200913
-    let color_link: Rgb = hex_to_rgb("#77a8d9".to_string());
+    let mut color_link: Rgb = hex_to_rgb(DEFAULT_COLOR_LINK.to_string());
 
     for record in file {
         match record.as_rule() {
@@ -108,6 +105,9 @@ fn main() {
             }
             Rule::color_subtitle => {
                 color_subtitle = hex_to_rgb(get_text(&record, Rule::color));
+            }
+            Rule::color_link => {
+                color_link = hex_to_rgb(get_text(&record, Rule::color));
             }
             Rule::EOI => (),
             _ => unreachable!(),

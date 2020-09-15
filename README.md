@@ -46,6 +46,7 @@ make help
 #@description A short description of your project (optional)
 #@color-title #a6cc70 (optional)
 #@color-subtitle #ffcc66 (optional)
+#@color-link #77a8d9 (optional)
 
 ## A description of my awesome-command
 command:
