@@ -16,7 +16,7 @@ bin/pretty-make:
 .PHONY: help
 ## List available commands
 help: bin/pretty-make
-	@bin/pretty-make Makefile
+	@$< $(firstword $(MAKEFILE_LIST)
 ```
 
 ### System-wide using cargo
@@ -32,7 +32,7 @@ Then you can use Pretty Make in your Makefile like this:
 .PHONY: help
 ## List available commands
 help:
-  @pretty-make Makefile
+	@pretty-make $(firstword $(MAKEFILE_LIST)
 ```
 
 ## ⌨️ Usage
