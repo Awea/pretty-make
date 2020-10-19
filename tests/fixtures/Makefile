@@ -12,7 +12,7 @@ node_modules: package.json yarn.lock
 	@touch $@
 
 .PHONY: this-is-a-supa-command
-## Supa dupa command description
+## 🦄 Supa dupa command description
 this-is-a-supa-command:
 
 .PHONY: test

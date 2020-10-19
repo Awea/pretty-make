@@ -1,5 +1,5 @@
 link = { ("http://" | "https://") ~ (LETTER | ":" | "." | NUMBER)+ }
-text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER)+ }
+text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER | OTHER_SYMBOL)+ }
 color = { "#" ~ (LETTER | NUMBER)+ }
 
 name = { "#@name " ~(text)* }
