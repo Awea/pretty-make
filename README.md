@@ -11,7 +11,7 @@ To use Pretty Make you only have to add the following at the end of your Makefil
 
 ```Makefile
 bin/pretty-make:
-	@bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
+	@curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh | bash -s
 
 .PHONY: help
 ## List available commands
