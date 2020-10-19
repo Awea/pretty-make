@@ -36,6 +36,11 @@ build: deps
 serve: deps
 	@$(GULP) --continue
 
+## Deploy site to https://example.my-super-site.com
+.PHONY: deploy
+deploy: deps
+	@command to deploy
+
 ## List available commands
 .PHONY: help
 help:

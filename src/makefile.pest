@@ -1,4 +1,4 @@
-link = { ("http://" | "https://") ~ (LETTER | ":" | "." | NUMBER)+ }
+link = { ("http://" | "https://") ~ (LETTER | ":" | "." | "-" | "/" | NUMBER)+ }
 text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER | OTHER_SYMBOL)+ }
 color = { "#" ~ (LETTER | NUMBER)+ }
 
