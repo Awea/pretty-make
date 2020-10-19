@@ -4,44 +4,59 @@
 #@color-subtitle #c970cc
 #@color-link #0314fc
 
+# Here we ensure that every command this Makefile run will run in a bash shell,
+# instead of the default 'sh'. This is actually just a variable assignment.
+SHELL := /usr/bin/env bash
+
+WEBPACK        := $(PWD)/node_modules/.bin/webpack
+WEBPACK_SERVER := $(PWD)/node_modules/.bin/webpack-dev-server
+
 .PHONY: deps
-deps: node_modules $(THEME_DIR)/vendor
+deps: node_modules #api/vendor
 
 node_modules: package.json yarn.lock
 	@yarn install
 	@touch $@
 
-.PHONY: this-is-a-supa-command
-## 🦄 Supa dupa command description
-this-is-a-supa-command:
-
-.PHONY: test
-## Test site
-## and stuff
-test: deps
-	@test
-
-## Another beaking the wall
-another:
-	@another
-
-.PHONY: build
-## Build site
-build: deps
-	@build
+api/vendor: api/composer.json api/composer.lock
+	@cd api ; composer install
+	touch $@
 
 .DEFAULT_GOAL := serve
-## Serve site at http://localhost:3000 with live reloading
+## Serve:
+## - Site at http://localhost:3000 with hot reloading
+## - API at http://localhost:3010
+## - phpMyAdmin at http://localhost:3011
 .PHONY: serve
-serve: deps
-	@$(GULP) --continue
+serve: api deps
+	@$(WEBPACK_SERVER) --inline --progress --config webpack/dev.js
 
-## Deploy site to https://example.my-super-site.com
-.PHONY: deploy
-deploy: deps
-	@command to deploy
+.PHONY: api
+api:
+	@docker-compose up -d
 
-## List available commands
+## Build site for production use
+.PHONY: build
+build: deps
+	@echo "Building front-end"
+	@rm -rf site/*
+	@NODE_ENV=production $(WEBPACK) --config webpack/prod.js
+	@echo "Front-end built!"
+
+## Deploy site to https://a-super-website.sub.domain.com
+deploy_staging: build
+	@echo "Deploy to a-super-website.sub.domain.com"
+	@rsync -avz --delete-before source target
+
+## Deploy site to https://a-super-website.fr
+deploy_prod: build
+	@echo "Deploy to a-super-website.fr"
+	@rsync -avz --delete-before source target
+
+bin/pretty-make:
+	@bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
+
 .PHONY: help
-help:
+## List available commands
+help: bin/pretty-make
 	@bin/pretty-make Makefile
