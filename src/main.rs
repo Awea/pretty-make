@@ -28,7 +28,6 @@ struct TargetWithHelpMessage {
 }
 
 const INDENT_WIDTH: usize = 4;
-const DEFAULT_DESCRIPTION: &str = "This project uses Make for commands.";
 const DEFAULT_COLOR_TITLE: &str = "#a6cc70";
 const DEFAULT_COLOR_SUBTITLE: &str = "#ffcc66";
 const DEFAULT_COLOR_LINK: &str = "#77a8d9";
@@ -126,9 +125,7 @@ fn main() {
     //  - RGB: 119, 168, 217
     println!("{}", color_text(project_name, color_title).bold());
     if project_description.len() > 0 {
-        println!("{} {} \n", project_description, DEFAULT_DESCRIPTION);
-    } else {
-        println!("{} \n", DEFAULT_DESCRIPTION);
+        println!("{} \n", project_description);
     }
     println!("{}", color_text("USAGE".to_string(), color_subtitle));
     println!("    {}\n", "make <SUBCOMMAND>");
