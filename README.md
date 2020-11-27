@@ -42,22 +42,30 @@ make help
 
 ## 📝 Makefile help syntax
 ```Makefile
-#@name Name of your project
-#@description A short description of your project (optional)
-#@color-title #a6cc70 (optional)
-#@color-subtitle #ffcc66 (optional)
-#@color-link #77a8d9 (optional)
+#@name Project name
+#@description Project description. (optional)
+#@color-title #70c3cc (optional)
+#@color-subtitle #c970cc (optional)
+#@color-link #0314fc (optional)
 
-## A description of my awesome-command
-command:
-	...
+# This is a comment and it won't appear in the `make help`.
 
-# A comment (which won't appear in the help)
+## Build site for production use
+.PHONY: build
+build: deps
+  @echo "Building front-end"
+  @rm -rf site/*
+  @NODE_ENV=production $(WEBPACK) --config webpack/prod.js
+  @echo "Front-end built!"
 
-## A description of my other command
-## on multiple lines!
-another-command:
-	...
+.DEFAULT_GOAL := serve
+## Serve:
+## - Site at http://localhost:3000 with hot reloading
+## - API at http://localhost:3010
+## - phpMyAdmin at http://localhost:3011
+.PHONY: serve
+serve: api deps
+  @$(WEBPACK_SERVER) --inline --progress --config webpack/dev.js
 ```
 
 ## ✍️ Authors

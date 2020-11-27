@@ -12,7 +12,7 @@ WEBPACK        := $(PWD)/node_modules/.bin/webpack
 WEBPACK_SERVER := $(PWD)/node_modules/.bin/webpack-dev-server
 
 .PHONY: deps
-deps: node_modules #api/vendor
+deps: node_modules api/vendor
 
 node_modules: package.json yarn.lock
 	@yarn install
@@ -21,6 +21,8 @@ node_modules: package.json yarn.lock
 api/vendor: api/composer.json api/composer.lock
 	@cd api ; composer install
 	touch $@
+
+# This is a comment and it won't appear in the `make help`.
 
 .DEFAULT_GOAL := serve
 ## Serve:
