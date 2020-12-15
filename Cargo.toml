@@ -12,7 +12,11 @@ edition = "2018"
 
 [dependencies]
 clap = "3.0.0-beta.1"
-pest = "2.1.3"
+
+# For now I'm using a fork of https://github.com/rafael-patronilo/pest to handle
+# almost all emojis - @awea 20201215
+# See related pull request: https://github.com/pest-parser/pest/pull/468
+pest = { git = "https://github.com/Awea/pest" }
 pest_derive = "2.1.0"
 colored = "2"
 colors-transform = "0.2.11"
