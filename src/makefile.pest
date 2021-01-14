@@ -1,3 +1,5 @@
+// Documentation: https://pest.rs/book/grammars/grammars.html
+
 link = { ("http://" | "https://") ~ (LETTER | ":" | "." | "-" | "/" | NUMBER)+ }
 text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER | SYMBOL)+ }
 color = { "#" ~ (LETTER | NUMBER)+ }
