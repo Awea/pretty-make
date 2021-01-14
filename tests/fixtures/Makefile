@@ -22,6 +22,11 @@ api/vendor: api/composer.json api/composer.lock
 	@cd api ; composer install
 	touch $@
 
+.PHONY: 2020
+## Reflect on last year
+2020:
+	echo "Last year"
+
 # This is a comment and it won't appear in the `make help`.
 
 .DEFAULT_GOAL := serve

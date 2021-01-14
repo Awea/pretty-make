@@ -12,7 +12,7 @@ help = _{ "## " ~ (text)* }
 
 phony = _{ ".PHONY: " ~ (LETTER)* }
 
-target_name = { (LETTER | "_" | "-" | "/")+ }
+target_name = { (LETTER | NUMBER | "_" | "-" | "/")+ }
 
 target = _{ (target_name)* ~ ":" }
 
