@@ -22,10 +22,19 @@ api/vendor: api/composer.json api/composer.lock
 	@cd api ; composer install
 	touch $@
 
+## Do something fancy
+$(shell foo)/fancy/path/recipe:
+	touch $@
+
 .PHONY: 2020
 ## Reflect on last year
 2020:
 	echo "Last year"
+
+.PHONY: docker-compose
+## Up containers
+docker-compose:
+	docker-compose up -d
 
 # This is a comment and it won't appear in the `make help`.
 

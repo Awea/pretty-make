@@ -12,16 +12,14 @@ color_link = { "#@color-link " ~(color)* }
 
 help = _{ "## " ~ (text)* }
 
-phony = _{ ".PHONY: " ~ (LETTER)* }
+phony = _{ ".PHONY: " ~ (!(NEWLINE) ~ ANY)+ }
 
-target_name = { (LETTER | NUMBER | "_" | "-" | "/")+ }
-
-target = _{ (target_name)* ~ ":" }
+target_name = { (!(":") ~ ANY)+ }
 
 target_with_help = {
-  (help ~ "\n")+
-  ~ (phony ~ "\n")*
-  ~ target
+  (help ~ NEWLINE)+
+  ~ (phony ~ NEWLINE)*
+  ~ target_name
 }
 
 makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | ANY)* ~ EOI}
