@@ -124,9 +124,14 @@ fn main() {
     // - link
     //  - RGB: 119, 168, 217
     println!("{}", color_text(project_name, color_title).bold());
+
     if project_description.len() > 0 {
-        println!("{} \n", project_description);
+        println!("{}", project_description);
     }
+
+    // Add a new line before displaying USAGE
+    // - @awea 20210407
+    println!("");
     println!("{}", color_text("USAGE".to_string(), color_subtitle));
     println!("    {}\n", "make <SUBCOMMAND>");
     println!("{}", color_text("SUBCOMMANDS".to_string(), color_subtitle));
