@@ -1,6 +1,6 @@
 [package]
 name = "pretty-make"
-version = "0.5.3"
+version = "0.5.4"
 authors = ["Awea <aweaoftheworld@gmail.com>"]
 license = "GPL-3.0-or-later"
 description = "Make Make pretty"

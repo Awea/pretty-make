@@ -246,7 +246,7 @@ dependencies = [
 
 [[package]]
 name = "pretty-make"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "clap",
  "colored",
