@@ -5,11 +5,16 @@
 # instead of the default 'sh'. This is actually just a variable assignment.
 SHELL := /usr/bin/env bash
 
-.DEFAULT_GOAL := run
-.PHONY: run
-## Run Pretty Make on tests/fixtures/Makefile
-run:
-	@cargo run -- tests/fixtures/Makefile
+.DEFAULT_GOAL := pretty-help
+.PHONY: pretty-help
+## Run Pretty Make pretty-help on tests/fixtures/Makefile
+pretty-help:
+	@cargo run -- pretty-help tests/fixtures/Makefile
+
+.PHONY: empty-run
+## List available commands for bin/pretty-make
+run-help:
+	@cargo run -- --help
 
 bin/pretty-make:
 	@curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh | bash -s
