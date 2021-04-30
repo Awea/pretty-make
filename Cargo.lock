@@ -160,7 +160,7 @@ dependencies = [
 [[package]]
 name = "pest"
 version = "2.1.3"
-source = "git+https://github.com/Awea/pest#2b1c37d738a0c0b06b512937a2d27866c65ca358"
+source = "git+https://github.com/pest-parser/pest#81faaca86b7bf2a2a5cb12c18dd4133042ddb70c"
 dependencies = [
  "ucd-trie",
 ]
@@ -206,7 +206,7 @@ dependencies = [
  "clap",
  "colored",
  "colors-transform",
- "pest 2.1.3 (git+https://github.com/Awea/pest)",
+ "pest 2.1.3 (git+https://github.com/pest-parser/pest)",
  "pest_derive",
 ]
 
