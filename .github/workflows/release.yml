@@ -1,28 +1,12 @@
 name: release
 on:
   push:
-    # Enable when testing release infrastructure on a branch.
-    # branches:
-    # - ag/release
     tags:
-    - '[0-9]+.[0-9]+.[0-9]+'
-jobs:
-  create-release:
-    name: create-release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Pretty Make ${{ github.ref }}
-          draft: false
-          prerelease: false
+      - '[0-9]+.[0-9]+.[0-9]+'
 
+jobs:
   build-release:
     name: build-release
-    needs: ['create-release']
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,23 +19,57 @@ jobs:
           os: macos-latest
           rust: nightly
           target: x86_64-apple-darwin
-
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
           override: true
+
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
           args: --release --target=${{ matrix.target }}
-      - uses: svenstaro/upload-release-action@v2
+
+      - uses: actions/upload-artifact@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target }}/release/pretty-make
-          asset_name: pretty-make-${{ matrix.build }}
-          tag: ${{ github.ref }}
-          overwrite: true
+          name: pretty-make-${{ matrix.build }}
+          path: target/${{ matrix.target }}/release/pretty-make
+
+  add-binaries-to-release:
+    name: add-binaries-to-release
+    needs: ['build-release']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+      - run: |
+          ls -l
+          mv -v pretty-make-linux/pretty-make pretty-make-linux/pretty-make-linux
+          mv -v pretty-make-macos/pretty-make pretty-make-macos/pretty-make-macos
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: Pretty Make ${{ github.ref }}
+          files: |
+            pretty-make-linux/*
+            pretty-make-macos/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-crate:
+    name: publish-crate
+    needs: ['build-release']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+      - uses: katyo/publish-crates@v1
+        with:
+            registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
