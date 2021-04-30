@@ -22,4 +22,4 @@ bin/pretty-make:
 .PHONY: help
 ## List available commands
 help: bin/pretty-make
-	@bin/pretty-make Makefile
+	@bin/pretty-make pretty-help Makefile
