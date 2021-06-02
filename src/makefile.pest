@@ -22,4 +22,18 @@ target_with_help = {
   ~ target_name
 }
 
-makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | ANY)* ~ EOI}
+help_section_sep = { "# --" ~ ("-")* }
+
+not_a_section_sep = { !("-") ~ (ANY) }
+
+help_section_title = { (!(NEWLINE) ~ ANY)+ }
+
+help_section_block = _{ "# " ~ help_section_title }
+
+help_section = {
+  help_section_block
+  ~ NEWLINE
+  ~ help_section_sep
+}
+
+makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | help_section | ANY)* ~ EOI}

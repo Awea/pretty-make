@@ -14,15 +14,26 @@ const DEFAULT_COLOR_LINK: &str = "#77a8d9";
 #[grammar = "makefile.pest"]
 struct MakefileParser;
 
+#[derive(Debug, Clone)]
+enum Help {
+    TargetWithHelpMessage(TargetWithHelpMessage),
+    HelpSection(HelpSection),
+}
+
 #[derive(Debug)]
 struct Targets {
-    targets: Vec<TargetWithHelpMessage>,
+    targets: Vec<Help>,
 }
 
 #[derive(Debug, Clone)]
 struct TargetWithHelpMessage {
     target_name: String,
     help_messages: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+struct HelpSection {
+    title: String,
 }
 
 // Print a pretty help using the given path to a **Makefile** with the following syntax:
@@ -98,7 +109,15 @@ pub fn print_help(makefile: &str) {
                     target_name,
                     help_messages,
                 };
-                targets.targets.push(target_with_help_messages)
+                targets
+                    .targets
+                    .push(Help::TargetWithHelpMessage(target_with_help_messages))
+            }
+            Rule::help_section => {
+                let title = get_text(&record, Rule::help_section_title);
+
+                let help_section = HelpSection { title };
+                targets.targets.push(Help::HelpSection(help_section))
             }
             Rule::name => {
                 project_name = get_text(&record, Rule::text);
@@ -150,22 +169,31 @@ pub fn print_help(makefile: &str) {
     println!("{}", color_text("SUBCOMMANDS".to_string(), color_subtitle));
 
     for target in targets.targets {
-        print!("{: <1$}", "", INDENT_WIDTH);
-        print!(
-            "{target_name: <col$}",
-            target_name = color_text(target.target_name, color_title).bold(),
-            col = help_message_offset
-        );
-
-        let mut i = 0;
-        for help_message in target.help_messages {
-            if i > 0 {
+        match target {
+            Help::TargetWithHelpMessage(target) => {
                 print!("{: <1$}", "", INDENT_WIDTH);
-                print!("{: <1$}", "", help_message_offset);
-            }
-            println!("{}", help_message);
+                print!(
+                    "{target_name: <col$}",
+                    target_name = color_text(target.target_name, color_title).bold(),
+                    col = help_message_offset
+                );
 
-            i = i + 1;
+                let mut i = 0;
+                for help_message in target.help_messages {
+                    if i > 0 {
+                        print!("{: <1$}", "", INDENT_WIDTH);
+                        print!("{: <1$}", "", help_message_offset);
+                    }
+                    println!("{}", help_message);
+
+                    i = i + 1;
+                }
+            }
+            Help::HelpSection(target) => {
+                println!("");
+                print!("{: <1$}", "", INDENT_WIDTH);
+                println!("{}", color_text(target.title, color_subtitle));
+            }
         }
     }
 }
@@ -193,17 +221,16 @@ fn get_text(record: &Pair<Rule>, rule_type: Rule) -> String {
 }
 
 fn help_message_offset(targets: &Targets) -> usize {
-    let longest_target_name =
-        targets
-            .targets
-            .iter()
-            .fold(targets.targets[0].clone(), |acc, item| {
-                if item.target_name.len() > acc.target_name.len() {
-                    item.clone()
-                } else {
-                    acc
-                }
-            });
+    let longest_target_name = targets.targets.iter().fold(0, |acc, item| match item {
+        Help::TargetWithHelpMessage(target) => {
+            if target.target_name.len() > acc {
+                target.target_name.len()
+            } else {
+                acc
+            }
+        }
+        _ => acc,
+    });
 
-    longest_target_name.target_name.len() + INDENT_WIDTH
+    longest_target_name + INDENT_WIDTH
 }
