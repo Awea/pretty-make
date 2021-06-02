@@ -1,6 +1,6 @@
 // Documentation: https://pest.rs/book/grammars/grammars.html
 
-link = { ("http://" | "https://") ~ (LETTER | ":" | "." | "-" | "/" | NUMBER)+ }
+link = { ("http://" | "https://" | "ssh://") ~ (LETTER | ":" | "." | "-" | "/" | NUMBER)+ }
 text = { (link | LETTER | SPACE_SEPARATOR | PUNCTUATION | NUMBER | SYMBOL)+ }
 color = { "#" ~ (LETTER | NUMBER)+ }
 
