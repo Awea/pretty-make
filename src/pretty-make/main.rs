@@ -16,8 +16,8 @@ struct MakefileParser;
 
 #[derive(Debug, Clone)]
 enum Help {
-    TargetWithHelpMessage(TargetWithHelpMessage),
-    HelpSection(HelpSection),
+    Target(TargetHelp),
+    Section(HelpSection),
 }
 
 #[derive(Debug)]
@@ -26,7 +26,7 @@ struct Targets {
 }
 
 #[derive(Debug, Clone)]
-struct TargetWithHelpMessage {
+struct TargetHelp {
     target_name: String,
     help_messages: Vec<String>,
 }
@@ -105,19 +105,19 @@ pub fn print_help(makefile: &str) {
                     })
                     .collect();
 
-                let target_with_help_messages = TargetWithHelpMessage {
+                let target_with_help_messages = TargetHelp {
                     target_name,
                     help_messages,
                 };
                 targets
                     .targets
-                    .push(Help::TargetWithHelpMessage(target_with_help_messages))
+                    .push(Help::Target(target_with_help_messages))
             }
             Rule::help_section => {
                 let title = get_text(&record, Rule::help_section_title);
 
                 let help_section = HelpSection { title };
-                targets.targets.push(Help::HelpSection(help_section))
+                targets.targets.push(Help::Section(help_section))
             }
             Rule::name => {
                 project_name = get_text(&record, Rule::text);
@@ -170,7 +170,7 @@ pub fn print_help(makefile: &str) {
 
     for target in targets.targets {
         match target {
-            Help::TargetWithHelpMessage(target) => {
+            Help::Target(target) => {
                 print!("{: <1$}", "", INDENT_WIDTH);
                 print!(
                     "{target_name: <col$}",
@@ -189,7 +189,7 @@ pub fn print_help(makefile: &str) {
                     i = i + 1;
                 }
             }
-            Help::HelpSection(target) => {
+            Help::Section(target) => {
                 println!("");
                 print!("{: <1$}", "", INDENT_WIDTH);
                 println!("{}", color_text(target.title, color_subtitle));
@@ -222,7 +222,7 @@ fn get_text(record: &Pair<Rule>, rule_type: Rule) -> String {
 
 fn help_message_offset(targets: &Targets) -> usize {
     let longest_target_name = targets.targets.iter().fold(0, |acc, item| match item {
-        Help::TargetWithHelpMessage(target) => {
+        Help::Target(target) => {
             if target.target_name.len() > acc {
                 target.target_name.len()
             } else {
