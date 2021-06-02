@@ -81,18 +81,16 @@ pub fn print_help(makefile: &str) {
             Rule::target_with_help => {
                 let target_name = get_text(&record, Rule::target_name);
                 let help_messages = record
-                    .clone()
                     .into_inner()
                     .filter(|x| x.as_rule() == Rule::text)
                     .map(|x| {
+                        let mut result = String::from(x.as_str());
+
                         let links: Vec<String> = x
-                            .clone()
                             .into_inner()
                             .filter(|x| x.as_rule() == Rule::link)
                             .map(|x| String::from(x.as_str()))
                             .collect();
-
-                        let mut result = String::from(x.as_str());
 
                         for link in links.iter() {
                             let colored_link =
