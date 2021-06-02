@@ -39,8 +39,8 @@ jobs:
           name: pretty-make-${{ matrix.build }}
           path: target/${{ matrix.target }}/release/pretty-make
 
-  add-binaries-to-release:
-    name: add-binaries-to-release
+  create-release:
+    name: create-release
     needs: ['build-release']
     runs-on: ubuntu-latest
     steps:
@@ -49,9 +49,12 @@ jobs:
           ls -l
           mv -v pretty-make-linux/pretty-make pretty-make-linux/pretty-make-linux
           mv -v pretty-make-macos/pretty-make pretty-make-macos/pretty-make-macos
+      - id: get_tag
+        run: |
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
       - uses: softprops/action-gh-release@v1
         with:
-          name: Pretty Make ${{ github.ref }}
+          name: Pretty Make ${{ steps.get_tag.outputs.SOURCE_TAG }}
           files: |
             pretty-make-linux/*
             pretty-make-macos/*
