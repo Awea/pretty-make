@@ -31,6 +31,14 @@ $(shell foo)/fancy/path/recipe:
 2020:
 	echo "Last year"
 
+# ✨ Here is a section
+# --------------
+#
+# Section dedicated to dependencies related target:
+# - .mk folder
+# - bin folder
+# - bin/mitogen
+
 .PHONY: docker-compose
 ## Up containers
 docker-compose:
@@ -58,6 +66,14 @@ build: deps
 	@rm -rf site/*
 	@NODE_ENV=production $(WEBPACK) --config webpack/prod.js
 	@echo "Front-end built!"
+
+# 💡 Here is another section
+# --------------
+#
+# Section dedicated to dependencies related target:
+# - .mk folder
+# - bin folder
+# - bin/mitogen
 
 ## Deploy site to https://a-super-website.sub.domain.com
 deploy_staging: build
