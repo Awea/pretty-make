@@ -8,6 +8,13 @@ homepage = "https://github.com/awea/pretty-make"
 repository = "https://github.com/awea/pretty-make"
 edition = "2018"
 
+# Supporting Binary Installation with cargo binstall pretty-make
+# See: https://github.com/ryankurte/cargo-binstall#Supporting-Binary-Installation
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/{ version }/{ name }-{ target }-v{ version }.{ format }"
+bin-dir = "{ name }-{ target }-v{ version }/{ bin }{ format }"
+pkg-fmt = "tgz"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

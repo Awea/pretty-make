@@ -34,10 +34,90 @@ jobs:
           command: build
           args: --release --target=${{ matrix.target }}
 
-      - uses: actions/upload-artifact@v1
+      # Inspired on: https://github.com/passcod/cargo-watch/blob/main/.github/workflows/release.yml#L123
+      - name: Extract version
+        shell: bash
+        run: |
+          set -euxo pipefail
+
+          version=$(grep -m1 -F 'version =' Cargo.toml | cut -d\" -f2)
+
+          if [[ -z "$version" ]]; then
+            echo "Error: no version :("
+            exit 1
+          fi
+
+          echo "$version" > VERSION
+
+      - name: Package
+        shell: bash
+        run: |
+          set -euxo pipefail
+          bin="target/${{ matrix.target }}/release/pretty-make"
+          dst="cargo-watch--${{ matrix.target }}"
+          mkdir "$dst"
+          strip "$bin" || true
+          mv "$bin" "$dst/"
+          mv README.md LICENSE completions cargo-watch.1 "$dst/"
+
+      - name: Archive (tar)
+        if: startsWith(matrix.name, 'linux-')
+        shell: bash
+        run: |
+          set -euxo pipefail
+          version=$(cat VERSION)
+          dst="cargo-watch-v${version}-${{ matrix.target }}"
+          tar cavf "$dst.tar.xz" "$dst"
+
+      - name: Archive (deb)
+        if: startsWith(matrix.name, 'linux-')
+        shell: bash
+        run: |
+          set -euxo pipefail
+          version=$(cat VERSION)
+          dst="cargo-watch-v${version}-${{ matrix.target }}"
+          mkdir -p "deb/$dst"
+          cd "deb/$dst"
+          mkdir -p DEBIAN usr/{bin,share/{man/man1,zsh/site-functions}}
+          cp "../../$dst/cargo-watch" usr/bin/
+          cp "../../$dst/cargo-watch.1" usr/share/man/man1/
+          cp "../../$dst/completions/zsh" usr/share/zsh/site-functions/_cargo-watch
+          cat <<-CONTROL > DEBIAN/control
+          Package: cargo-watch
+          Version: ${version/v/}
+          Architecture: $(echo "${{ matrix.name }}" | cut -d- -f2)
+          Maintainer: Félix Saparelli <aur@passcod.name>
+          Installed-Size: $(du -d1 usr | tail -n1 | cut -d\t -f1)
+          Homepage: https://github.com/passcod/cargo-watch
+          Description: Watches over your Cargo project's source.
+           Cargo Watch watches over your project's source for changes, and runs Cargo commands when they occur.
+          CONTROL
+          cd ..
+          fakeroot dpkg -b "$dst"
+          mv "$dst.deb" ../
+          cd ..
+      - name: Archive (zip)
+        if: startsWith(matrix.name, 'windows-')
+        shell: bash
+        run: |
+          set -euxo pipefail
+          version=$(cat VERSION)
+          dst="cargo-watch-v${version}-${{ matrix.target }}"
+          7z a "$dst.zip" "$dst"
+
+      - uses: actions/upload-artifact@v2
         with:
           name: pretty-make-${{ matrix.build }}
           path: target/${{ matrix.target }}/release/pretty-make
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: builds
+          retention-days: 1
+          path: |
+            cargo-watch-v*.tar.xz
+            cargo-watch-v*.deb
+            cargo-watch-v*.zip
 
   create-release:
     name: create-release
