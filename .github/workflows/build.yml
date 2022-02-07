@@ -1,0 +1,32 @@
+name: release
+on:
+  push:
+    branches-ignore:
+      - 'master'
+
+jobs:
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - build: linux
+          os: ubuntu-18.04
+          rust: nightly
+          target: x86_64-unknown-linux-musl
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release --target=${{ matrix.target }}
