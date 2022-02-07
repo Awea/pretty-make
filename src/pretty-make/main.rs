@@ -3,6 +3,7 @@ use colors_transform::{Color, Rgb};
 use pest::iterators::Pair;
 use pest::Parser;
 use std::fs;
+use std::process;
 
 const INDENT_WIDTH: usize = 4;
 const DEFAULT_COLOR_TITLE: &str = "#a6cc70";
@@ -117,6 +118,12 @@ pub fn print_help(makefile: &str) {
             Rule::EOI => (),
             _ => unreachable!(),
         }
+    }
+
+    if targets.targets.len() == 0 {
+        println!("{}", "No help message found please read the readme: https://github.com/awea/pretty-make#readme".bold());
+
+        process::exit(1);
     }
 
     let help_message_offset = help_message_offset(&targets);
