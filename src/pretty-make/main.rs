@@ -189,8 +189,9 @@ pub fn print_help(makefile: &str) {
             }
             Help::Section(target) => {
                 println!("");
-                print!("{: <1$}", "", INDENT_WIDTH);
+                print!("{: <1$}", "", INDENT_WIDTH / 2);
                 println!("{}", color_text(target.title, color_subtitle));
+                println!("");
             }
         }
     }
