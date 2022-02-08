@@ -11,6 +11,11 @@ SHELL := /usr/bin/env bash
 pretty-help:
 	@cargo run -- pretty-help tests/fixtures/Makefile
 
+.PHONY: build
+## Build pretty-make
+build:
+	@cargo build
+
 .PHONY: empty-run
 ## List available commands for bin/pretty-make
 run-help:
