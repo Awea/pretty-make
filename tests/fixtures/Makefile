@@ -80,7 +80,7 @@ deploy_staging: build
 	@echo "Deploy to a-super-website.sub.domain.com"
 	@rsync -avz --delete-before source target
 
-## Deploy site to https://a-super-website.fr
+## Deploy site to https://a-super-website.fr#anchor
 deploy_prod: build
 	@echo "Deploy to a-super-website.fr"
 	@rsync -avz --delete-before source target
