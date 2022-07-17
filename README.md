@@ -3,7 +3,7 @@ Make [Make](https://www.gnu.org/software/make/) pretty.
 
 This program intend to extend Make capabilities. Actually it parse a Makefile to produce a pretty help. See example below:
 
-🚧 screenshot
+![example.png](example.png)
 
 ## 🏁 Installation
 ### Per project by downloading the binary
