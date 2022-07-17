@@ -58,6 +58,9 @@ build: deps
   @NODE_ENV=production $(WEBPACK) --config webpack/prod.js
   @echo "Front-end built!"
 
+# ✨ This display a title
+# --
+
 .DEFAULT_GOAL := serve
 ## Serve:
 ## - Site at http://localhost:3000 with hot reloading
