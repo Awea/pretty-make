@@ -19,6 +19,11 @@ jobs:
           os: macos-latest
           rust: nightly
           target: x86_64-apple-darwin
+        - build: macos-arm
+          os: macos-latest
+          rust: nightly
+          target: aarch64-apple-darwin
+
     steps:
       - uses: actions/checkout@v2
 
@@ -49,6 +54,7 @@ jobs:
           ls -l
           mv -v pretty-make-linux/pretty-make pretty-make-linux/pretty-make-linux
           mv -v pretty-make-macos/pretty-make pretty-make-macos/pretty-make-macos
+          mv -v pretty-make-macos-arm/pretty-make pretty-make-macos-arm/pretty-make-macos-arm
       - id: get_tag
         run: |
           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
@@ -58,6 +64,7 @@ jobs:
           files: |
             pretty-make-linux/*
             pretty-make-macos/*
+            pretty-make-macos-arm/*
           draft: false
           prerelease: false
         env:
