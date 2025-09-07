@@ -12,13 +12,17 @@ color_link = { "#@color-link " ~(color)* }
 
 help = _{ "## " ~ (text)* }
 
+comment = _{ "#" ~ !("#") ~ (!(NEWLINE) ~ ANY)* }
+
 phony = _{ ".PHONY: " ~ (!(NEWLINE) ~ ANY)+ }
 
-target_name = { (!(":") ~ ANY)+ }
+target_name = { (!(":" | NEWLINE) ~ ANY)+ }
+
+other_line = _{ !(help | phony | target_name ~ ":") ~ (!(NEWLINE) ~ ANY)+ }
 
 target_with_help = {
   (help ~ NEWLINE)+
-  ~ (phony ~ NEWLINE)*
+  ~ (comment ~ NEWLINE | phony ~ NEWLINE | other_line ~ NEWLINE)*
   ~ target_name
 }
 
@@ -36,4 +40,4 @@ help_section = {
   ~ help_section_sep
 }
 
-makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | help_section | ANY)* ~ EOI}
+makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | help_section | comment | ANY)* ~ EOI}

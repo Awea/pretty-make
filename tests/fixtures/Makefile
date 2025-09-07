@@ -85,6 +85,13 @@ deploy_prod: build
 	@echo "Deploy to a-super-website.fr"
 	@rsync -avz --delete-before source target
 
+## Run the tests
+.PHONY: test
+test_file ?= test/
+test_args = ""
+test:
+	@echo "🧪  Run the tests"
+
 bin/pretty-make:
 	@bash <(curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh)
 
