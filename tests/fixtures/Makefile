@@ -11,6 +11,8 @@ SHELL := /usr/bin/env bash
 WEBPACK        := $(PWD)/node_modules/.bin/webpack
 WEBPACK_SERVER := $(PWD)/node_modules/.bin/webpack-dev-server
 
+include sub/Makefile
+
 .PHONY: deps
 deps: node_modules api/vendor
 

@@ -7,9 +7,12 @@ SHELL := /usr/bin/env bash
 
 .DEFAULT_GOAL := pretty-help
 .PHONY: pretty-help
-## Run Pretty Make pretty-help on tests/fixtures/Makefile
+## Run Pretty Make pretty-help on:
+# - tests/fixtures/Makefile
+# - tests/fixtures/Makefile-makeflags
 pretty-help:
 	@cargo run -- pretty-help tests/fixtures/Makefile
+	@cargo run -- pretty-help tests/fixtures/Makefile-makeflags
 
 .PHONY: build
 ## Build pretty-make

@@ -1,0 +1,69 @@
+## Main application build target
+.PHONY: build
+build: common-setup build-shared-libs
+	@echo "Building main application with shared components"
+
+## Development workflow target
+.PHONY: dev
+dev: install-deps dev-server
+	@echo "Starting development environment"
+
+## Full test suite
+.PHONY: test
+test: test-common test-libs
+	@echo "Running complete test suite"
+
+include common.mk
+
+# Production Section
+# ------------------
+
+## Production deployment
+.PHONY: deploy
+deploy: build package-libs
+	@echo "Deploying to production with all dependencies"
+
+## Production health check
+.PHONY: health-check
+health-check:
+	@echo "Running production health checks"
+
+include libs.mk
+
+# Development Section
+# -------------------
+
+## Development environment setup
+.PHONY: setup-dev
+setup-dev: install-deps format lint
+	@echo "Development environment ready"
+
+## Code quality checks
+.PHONY: quality
+quality: lint format security-audit vendor-audit
+	@echo "All quality checks passed"
+
+include tools.mk
+
+# Maintenance Section
+# -------------------
+
+## Full system cleanup
+.PHONY: clean-all
+clean-all: common-clean clean-libs vendor-clean
+	@echo "Complete system cleanup finished"
+
+## Update all dependencies
+.PHONY: update-all
+update-all: vendor-update install-deps
+	@echo "All dependencies updated"
+
+## Generate complete documentation
+.PHONY: docs-full
+docs-full: docs
+	@echo "Complete documentation generated"
+
+## Comprehensive system check
+.PHONY: check-system
+check-system: vendor-check security-audit health-check
+	@echo "System check completed successfully"

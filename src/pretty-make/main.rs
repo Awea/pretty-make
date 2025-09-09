@@ -2,7 +2,9 @@ use colored::*;
 use colors_transform::{Color, Rgb};
 use pest::iterators::Pair;
 use pest::Parser;
+use std::env;
 use std::fs;
+use std::path::Path;
 use std::process;
 
 const INDENT_WIDTH: usize = 4;
@@ -64,9 +66,7 @@ struct HelpSection {
 //   @$(WEBPACK_SERVER) --inline --progress --config webpack/dev.js
 // ```
 pub fn print_help(makefile: &str) {
-    let unparsed_file = fs::read_to_string(makefile).expect("cannot read file");
-    let file =
-        MakefileParser::parse(Rule::makefile, &unparsed_file).unwrap_or_else(|e| panic!("{}", e));
+    let makefile_path = Path::new(makefile);
     let mut targets = Targets {
         targets: Vec::new(),
     };
@@ -75,65 +75,86 @@ pub fn print_help(makefile: &str) {
     let mut color_title: Rgb = hex_to_rgb(DEFAULT_COLOR_TITLE.to_string());
     let mut color_subtitle: Rgb = hex_to_rgb(DEFAULT_COLOR_SUBTITLE.to_string());
     let mut color_link: Rgb = hex_to_rgb(DEFAULT_COLOR_LINK.to_string());
+    let mut includes = Vec::new();
 
-    for record in file {
-        match record.as_rule() {
-            Rule::target_with_help => {
-                let target_name = get_text(&record, Rule::target_name);
-                let help_messages = record
-                    .into_inner()
-                    .filter(|x| x.as_rule() == Rule::text)
-                    .map(|x| {
-                        let mut result = String::from(x.as_str());
+    parse_makefile(
+        makefile_path,
+        &mut targets,
+        &mut project_name,
+        &mut project_description,
+        &mut color_title,
+        &mut color_subtitle,
+        &mut color_link,
+        &mut includes,
+    );
 
-                        let links: Vec<String> = x
-                            .into_inner()
-                            .filter(|x| x.as_rule() == Rule::link)
-                            .map(|x| String::from(x.as_str()))
-                            .collect();
+    // Process includes after main file is parsed
+    let include_dirs = get_include_dirs_from_makeflags();
 
-                        for link in links.iter() {
-                            let colored_link =
-                                format!("{}", color_text(link.to_string(), color_link));
+    for include_path in includes {
+        let base_dir = makefile_path.parent().unwrap_or(Path::new("."));
+        let included_file_path = find_included_file(include_path.trim(), base_dir, &include_dirs);
 
-                            result = result.replace(link, &colored_link);
-                        }
+        if let Some(included_file_path) = included_file_path {
+            let mut included_targets_container = Targets {
+                targets: Vec::new(),
+            };
+            let mut nested_includes = Vec::new();
+            parse_makefile(
+                &included_file_path,
+                &mut included_targets_container,
+                &mut project_name,
+                &mut project_description,
+                &mut color_title,
+                &mut color_subtitle,
+                &mut color_link,
+                &mut nested_includes,
+            );
 
-                        result
-                    })
-                    .collect();
-
-                let target_with_help_messages = TargetHelp {
-                    target_name,
-                    help_messages,
+            if !included_targets_container.targets.is_empty() {
+                let file_path_str = included_file_path.to_string_lossy().to_string();
+                let section_title = format!("Help for {}:", file_path_str);
+                let help_section = HelpSection {
+                    title: section_title,
                 };
-                targets
-                    .targets
-                    .push(Help::Target(target_with_help_messages))
+                targets.targets.push(Help::Section(help_section));
+                targets.targets.extend(included_targets_container.targets);
             }
-            Rule::help_section => {
-                let title = get_text(&record, Rule::help_section_title);
 
-                let help_section = HelpSection { title };
-                targets.targets.push(Help::Section(help_section))
+            // Process nested includes
+            for nested_include_path in nested_includes {
+                let nested_base_dir = included_file_path.parent().unwrap_or(Path::new("."));
+                let nested_included_file_path =
+                    find_included_file(nested_include_path.trim(), nested_base_dir, &include_dirs);
+
+                if let Some(nested_included_file_path) = nested_included_file_path {
+                    let mut nested_targets_container = Targets {
+                        targets: Vec::new(),
+                    };
+                    let mut nested_nested_includes = Vec::new();
+                    parse_makefile(
+                        &nested_included_file_path,
+                        &mut nested_targets_container,
+                        &mut project_name,
+                        &mut project_description,
+                        &mut color_title,
+                        &mut color_subtitle,
+                        &mut color_link,
+                        &mut nested_nested_includes,
+                    );
+
+                    if !nested_targets_container.targets.is_empty() {
+                        let nested_file_path_str =
+                            nested_included_file_path.to_string_lossy().to_string();
+                        let nested_section_title = format!("Help for {}:", nested_file_path_str);
+                        let nested_help_section = HelpSection {
+                            title: nested_section_title,
+                        };
+                        targets.targets.push(Help::Section(nested_help_section));
+                        targets.targets.extend(nested_targets_container.targets);
+                    }
+                }
             }
-            Rule::name => {
-                project_name = get_text(&record, Rule::text);
-            }
-            Rule::description => {
-                project_description = get_text(&record, Rule::text);
-            }
-            Rule::color_title => {
-                color_title = hex_to_rgb(get_text(&record, Rule::color));
-            }
-            Rule::color_subtitle => {
-                color_subtitle = hex_to_rgb(get_text(&record, Rule::color));
-            }
-            Rule::color_link => {
-                color_link = hex_to_rgb(get_text(&record, Rule::color));
-            }
-            Rule::EOI => (),
-            _ => unreachable!(),
         }
     }
 
@@ -195,6 +216,149 @@ pub fn print_help(makefile: &str) {
             }
         }
     }
+}
+
+fn parse_makefile(
+    makefile_path: &Path,
+    targets: &mut Targets,
+    project_name: &mut String,
+    project_description: &mut String,
+    color_title: &mut Rgb,
+    color_subtitle: &mut Rgb,
+    color_link: &mut Rgb,
+    includes: &mut Vec<String>,
+) {
+    let unparsed_file = fs::read_to_string(makefile_path).expect("cannot read file");
+    let file =
+        MakefileParser::parse(Rule::makefile, &unparsed_file).unwrap_or_else(|e| panic!("{}", e));
+
+    for record in file {
+        match record.as_rule() {
+            Rule::target_with_help => {
+                let target_name = get_text(&record, Rule::target_name);
+                let help_messages = record
+                    .into_inner()
+                    .filter(|x| x.as_rule() == Rule::text)
+                    .map(|x| {
+                        let mut result = String::from(x.as_str());
+
+                        let links: Vec<String> = x
+                            .into_inner()
+                            .filter(|x| x.as_rule() == Rule::link)
+                            .map(|x| String::from(x.as_str()))
+                            .collect();
+
+                        for link in links.iter() {
+                            let colored_link =
+                                format!("{}", color_text(link.to_string(), *color_link));
+
+                            result = result.replace(link, &colored_link);
+                        }
+
+                        result
+                    })
+                    .collect();
+
+                let target_with_help_messages = TargetHelp {
+                    target_name,
+                    help_messages,
+                };
+                targets
+                    .targets
+                    .push(Help::Target(target_with_help_messages))
+            }
+            Rule::help_section => {
+                let title = get_text(&record, Rule::help_section_title);
+
+                let help_section = HelpSection { title };
+                targets.targets.push(Help::Section(help_section))
+            }
+            Rule::name => {
+                if project_name.is_empty() {
+                    *project_name = get_text(&record, Rule::text);
+                }
+            }
+            Rule::description => {
+                if project_description.is_empty() {
+                    *project_description = get_text(&record, Rule::text);
+                }
+            }
+            Rule::color_title => {
+                *color_title = hex_to_rgb(get_text(&record, Rule::color));
+            }
+            Rule::color_subtitle => {
+                *color_subtitle = hex_to_rgb(get_text(&record, Rule::color));
+            }
+            Rule::color_link => {
+                *color_link = hex_to_rgb(get_text(&record, Rule::color));
+            }
+            Rule::include_statement => {
+                let include_path = get_text(&record, Rule::include_path);
+                includes.push(include_path);
+            }
+            Rule::EOI => (),
+            _ => unreachable!(),
+        }
+    }
+}
+
+fn get_include_dirs_from_makeflags() -> Vec<String> {
+    let mut include_dirs = Vec::new();
+
+    if let Ok(makeflags) = env::var("MAKEFLAGS") {
+        let parts: Vec<&str> = makeflags.split_whitespace().collect();
+        let mut i = 0;
+
+        while i < parts.len() {
+            if parts[i] == "-I" && i + 1 < parts.len() {
+                include_dirs.push(parts[i + 1].to_string());
+                i += 2;
+            } else if parts[i] == "I" && i + 1 < parts.len() {
+                // Handle I path format (without dash)
+                include_dirs.push(parts[i + 1].to_string());
+                i += 2;
+            } else if parts[i].starts_with("-I") {
+                // Handle -Ipath format
+                let path = &parts[i][2..];
+                if !path.is_empty() {
+                    include_dirs.push(path.to_string());
+                }
+                i += 1;
+            } else {
+                i += 1;
+            }
+        }
+    }
+
+    include_dirs
+}
+
+fn find_included_file(
+    include_path: &str,
+    base_dir: &Path,
+    include_dirs: &[String],
+) -> Option<std::path::PathBuf> {
+    // First try relative to the current makefile's directory
+    let local_path = base_dir.join(include_path);
+    if local_path.exists() {
+        return Some(local_path);
+    }
+
+    // Then try each directory from MAKEFLAGS -I
+    for include_dir in include_dirs {
+        let search_path = Path::new(include_dir).join(include_path);
+        if search_path.exists() {
+            return Some(search_path);
+        }
+
+        // Also try relative to base_dir + include_dir
+        let relative_search_path = base_dir.join(include_dir).join(include_path);
+        if relative_search_path.exists() {
+            return Some(relative_search_path);
+        }
+    }
+
+    None
 }
 
 fn hex_to_rgb(hex: String) -> Rgb {

@@ -10,6 +10,9 @@ color_title = { "#@color-title " ~(color)* }
 color_subtitle = { "#@color-subtitle " ~(color)* }
 color_link = { "#@color-link " ~(color)* }
 
+include_path = { (!NEWLINE ~ ANY)+ }
+include_statement = { ("-")? ~ "include " ~ include_path }
+
 help = _{ "## " ~ (text)* }
 
 comment = _{ "#" ~ !("#") ~ (!(NEWLINE) ~ ANY)* }
@@ -40,4 +43,4 @@ help_section = {
   ~ help_section_sep
 }
 
-makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | help_section | comment | ANY)* ~ EOI}
+makefile = _{ SOI ~ (name | description | color_title | color_subtitle | color_link | target_with_help | help_section | include_statement | comment | ANY)* ~ EOI}
