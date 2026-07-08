@@ -19,6 +19,16 @@ help: bin/pretty-make
 	@bin/pretty-make pretty-help Makefile
 ```
 
+The installation path (default to `bin`) can also be configured with the `INSTALL_PATH` environment variable.
+
+Example to install in `.bin` instead of `bin`:
+
+```
+.bin/pretty-make:
+	@export INSTALL_PATH=.bin
+	curl -Ls https://raw.githubusercontent.com/awea/pretty-make/master/scripts/install.sh | bash -s
+```
+
 ### System-wide using cargo
 First you have to install Pretty Make using the following command:
 
