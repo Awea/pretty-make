@@ -20,6 +20,12 @@ fn main() {
         .version(VERSION)
         .author(AUTHORS)
         .about(DESCRIPTION)
+        .arg(
+            Arg::with_name("makefile")
+                .help("Makefile to be pretty")
+                .index(1)
+                .default_value("Makefile"),
+        )
         .subcommands(vec![
             SubCommand::with_name("pretty-help")
                 .about("Parse a Makefile to produce a pretty help.")
@@ -31,9 +37,13 @@ fn main() {
         ])
         .get_matches();
 
-    if let Some(ref matches) = matches.subcommand_matches("pretty-help") {
-        if let Some(makefile) = matches.value_of("makefile") {
-            pretty_make::main::print_help(makefile);
-        }
+    let default_makefile = matches.value_of("makefile").unwrap();
+
+    if let Some(ref sub_matches) = matches.subcommand_matches("pretty-help") {
+        let makefile = sub_matches.value_of("makefile").unwrap_or(default_makefile);
+        pretty_make::main::print_help(makefile);
+    } else {
+        eprintln!("Error: to produce a pretty help please use `pretty-make pretty-help {}`", default_makefile);
+        std::process::exit(1);
     }
 }
