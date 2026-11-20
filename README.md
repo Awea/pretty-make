@@ -50,6 +50,8 @@ help:
 make help
 ```
 
+`pretty-make Makefile` is the short form of `pretty-make pretty-help Makefile`.
+
 ## 📝 Makefile help syntax
 ```Makefile
 #@name Project name
